@@ -31,6 +31,8 @@ def alternate_case(msg):
         result.append(char.upper())
       else:
         result.append(char.lower())
-        toggle = not toggle
+      toggle = not toggle
+    else:
+      result.append(char)
 
-    return ''.join(result)
+  return ''.join(result)

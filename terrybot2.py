@@ -1,5 +1,5 @@
 #packages
-import discord
+import nextcord
 import asyncio
 import random
 from datetime import datetime, timedelta
@@ -8,11 +8,11 @@ from datetime import datetime, timedelta
 import config
 import messages
 
-intents = discord.Intents.default()
+intents = nextcord.Intents.default()
 intents.message_content = True
 intents.typing = True
 
-client = discord.Client(intents=intents)
+client = nextcord.Client(intents=intents)
 
 #some actions have a cooldown so they do not happen too often
 cd_ontype_users = set()
@@ -30,6 +30,7 @@ async def send_daily_hbd_message():
       target_time += timedelta(days=1)
 
     wait_time = (target_time - now).total_seconds()
+    print(f'HBD message successfully scheduled for {target_time}, in {wait_time} seconds.')
     await asyncio.sleep(wait_time)
     if datetime.now().month == 8:
       await channel.send(random.choice(messages.hbd_messages))
@@ -39,6 +40,7 @@ async def send_daily_hbd_message():
 @client.event
 async def on_ready():
   print(f'Bot successfully logged in as {client.user}')
+  client.loop.create_task(send_daily_hbd_message())
 
 #behavior for various messages
 @client.event
@@ -60,7 +62,5 @@ async def on_typing(channel, user, when):
       await channel.send('MESSAGE') #TODO - add messages for on_typing replies
     await asyncio.sleep(30 * 60)
     cd_ontype_users.remove(user.id)
-
-client.loop.create_task(send_daily_hbd_message())
 
 client.run(config.token)
