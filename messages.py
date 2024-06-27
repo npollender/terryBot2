@@ -2,7 +2,7 @@
 hbd_messages = [
   'Happy birthday Terry!'
   'it is terrys birthday my dudes',
-  'terry womb exiting day',
+  'Happy terry womb exiting day',
   'HBD Terrance!!!',
   'TERRY BIRD DAY CELEBRATION',
   'It is with great pleasure that I announce the day of birth of Terrance Ratigan.',
@@ -12,13 +12,70 @@ hbd_messages = [
 
 #happy birthday replies
 hbd_replies = [
+  'yo thats what im saying!',
+  'fr fr happy birthday terrrrryyyy!!!!',
+  'this is pretty true',
+  'OMG YES HBD TERRANCE',
+  'aaayyyyy lets gooooo',
+  'happy birf day tewwy',
+  'ladies and gentlemen, it is with great pleasure to inform you that it is terrys birthday',
+  'me when its terrys birthday',
+  'aka essence reaver tryndamere appreciation day',
+  'a birthday a day keeps the dogtor away',
+  'nice',
+  'hApPy BiRtHdAy TeRrY',
+  'gimornous birthday time mhm',
+  'happy michigan birthday*',
+  'cap',
+  'imagine not having a birthday today lmaooooooooo'
+]
 
+#statuses
+main_status = '>info | '
+hbd_statuses = [
+  'Happy birthday Terry!',
+  'Terry womb exiting day',
+  'I love Terry',
+  '10/10 would hbd Terry again',
+  'H B D T E R R Y'
+]
+
+#rude_replies
+rude_replies = [
+  'who asked?',
+  'any askers?',
+  'nobody asked terry',
+  'me when I didnt ask'
 ]
 
 #on_typing replies
 on_typing_replies = [
+  'shut up terry'
+  'stop typing terry'
+  'dont even think about sending that message terry, no one cares'
+]
+
+#on_voice_state_update messages
+on_voice_messages = [
+  'look who it is',
+  'oh no, not this guy',
+  'the birthday boy is back in town!!!',
+  'hey guys, terry just joined the call fyi',
+  'it is terry my dudes'
+]
+
+#various single use messages
+self_hbd = 'Why are you wishing yourself a happy birthday lmao?'
+reply_prio = 'You don\'t know what prio is.'
+
+#command messages
+cmd_info = 'I\'m HBDTerryBot, I have been programmed to wish our wonderful Terry a happy birthday every day! I also have an unexplainably conflicting relationship with Terry which is why I also find pleasure in insulting him.'
+
+#gif urls
+gif_urls = [
   
 ]
+alternate_case_url = 'https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZjAwdXg1aWFyYmJtN3pqanR6ZWt6bjdsNGx4bnM5OXhqZmZ5dDY4NiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/QUXYcgCwvCm4cKcrI3/giphy.gif'
 
 #alternate uppercase & lowercase for msg
 def alternate_case(msg):
