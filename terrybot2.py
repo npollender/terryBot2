@@ -49,7 +49,7 @@ async def send_daily_hbd_message():
   print(f'HBD message successfully scheduled for {target_time}, in {wait_time} seconds.')
   await asyncio.sleep(wait_time)
 
-  if datetime.now() == 8:
+  if now == 8:
     channel = bot.get_channel(config.text_main)
     if channel:
       await channel.send(random.choice(messages.hbd_messages))
@@ -57,8 +57,8 @@ async def send_daily_hbd_message():
 #randomly change bot status every 15 minutes
 @tasks.loop(minutes=15)
 async def change_status():
-  new_status = random.choice(f'{messages.main_status}{messages.hbd_statuses}')
-  await bot.change_presence(activity=nextcord.Game(name=new_status))
+  new_status = f'{messages.main_status}{random.choice(messages.hbd_statuses)}'
+  await bot.change_presence(activity=nextcord.CustomActivity(name=new_status))
 
 ##################
 # --- EVENTS --- #
@@ -71,21 +71,23 @@ async def on_message(message):
   if message.author == bot.user:
     return
   
+  now = datetime.now()
+
   #react upon message in main text channel
   if message.channel.id == config.text_main:
-    if re.search(r'\b(?:happy birthday|hbd)\b.*\bterry\b', message.content, re.IGNORECASE):
-      if message.author == config.user_terry:
-        await message.channel.reply(messages.self_hbd)
+    if re.search(r'\b(?:happy birthday|hbd)\b.*\bterry\b', message.content, re.IGNORECASE) and now == 8:
+      if message.author.id == config.user_terry:
+        await message.reply(messages.self_hbd)
       else:
-        await message.channel.reply(random.choice(messages.hbd_replies))
-    elif message.author == config.user_terry and len(message.content) > 20:
+        await message.reply(random.choice(messages.hbd_replies))
+    elif message.author.id == config.user_terry and len(message.content) > 20:
       alt_chance = 1 / (len(messages.rude_replies) + 1)
       if random.random() < alt_chance:
-        await message.channel.reply(f'{messages.alternate_case(message.content)}\n{messages.alternate_case_url}')
+        await message.reply(f'{messages.alternate_case(message.content)}\n{messages.alternate_case_url}')
       else:
-        await message.channel.reply(random.choice(messages.rude_replies))
+        await message.reply(random.choice(messages.rude_replies))
     elif re.search(r'\b(?:prio|priority)\b', message.content, re.IGNORECASE):
-      await message.channel.reply(messages.reply_prio)
+      await message.reply(messages.reply_prio)
 
   await bot.process_commands(message)
 
@@ -104,7 +106,7 @@ async def on_typing(channel, user, when):
 async def on_voice_state_update(member, before, after):
   if member.id == config.user_terry and before.channel is None and after.channel.id == config.voice_main and member.id not in cd_onvoice_users:
     cd_onvoice_users.add(member.id)
-    text_channel = config.text_main
+    text_channel = bot.get_channel(config.text_main)
     await text_channel.send(random.choice(messages.on_voice_messages))
     await asyncio.sleep(30 * 60)
     cd_onvoice_users.remove(member.id)
@@ -114,27 +116,33 @@ async def on_voice_state_update(member, before, after):
 ####################
 
 #bot info
-@bot.command
+@bot.command()
 async def info(ctx):
   await ctx.send(messages.cmd_info)
 
 #list of *non-secret* commands
-@bot.command
+@bot.command()
 async def cmd(ctx):
   await ctx.send() #TODO - add list of commands to messages.py
 
 #tmp - test if sound is played
-@bot.command
-async def tmp_play_sound(ctx):
-  if ctx.author.voice:
-    channel = ctx.author.voice.channel
-    vc = await channel.connect()
+@bot.command()
+async def outro(ctx, volume: float = 0.2):
+      # Ensure the user is in a voice channel
+    if ctx.author.voice:
+        channel = ctx.author.voice.channel
+        voice_client = await channel.connect()
+    
+    audio_source = nextcord.FFmpegPCMAudio('./media/outro.mp3')
+    audio_source = nextcord.PCMVolumeTransformer(audio_source, volume=volume)
 
-    vc.play(nextcord.FFmpegPCMAudio('')) #TODO - add media folder with sounds/audio
-    while vc.is_playing():
-      nextcord.sleep(1)
+    def after_playing():
+        co_routine = voice_client.disconnect()
+        asyncio.run_coroutine_threadsafe(co_routine, bot.loop)
 
-    await vc.disconnect()
+    #play the audio file and disconnect after it finishes
+    if not voice_client.is_playing():
+        voice_client.play(audio_source, after=after_playing)
 
 ###############
 # --- RUN --- #
