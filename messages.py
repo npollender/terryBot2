@@ -39,6 +39,16 @@ hbd_statuses = [
   '10/10 would hbd Terry again',
   'H B D T E R R Y'
 ]
+standard_statuses = [
+  'ginemenasaurus',
+  'whatever you say',
+  'gigantasourus',
+  'gimenis-ba-manmoris',
+  'symenaf morf',
+  'gigananorstis',
+  'mmhm',
+  'gimornis'
+]
 
 #rude_replies
 rude_replies = [
@@ -64,12 +74,20 @@ on_voice_messages = [
   'it is terry my dudes'
 ]
 
+#on_voice_state_update audio paths
+on_voice_audio_paths = [
+
+]
+
 #various single use messages
 self_hbd = 'Why are you wishing yourself a happy birthday lmao?'
 reply_prio = 'You don\'t know what prio is.'
 
 #command messages
-cmd_info = 'I\'m HBDTerryBot, I have been programmed to wish our wonderful Terry a happy birthday every day! I also have an unexplainably conflicting relationship with Terry which is why I also find pleasure in insulting him.'
+cmd_info = 'I\'m HBDTerryBot, I have been programmed to wish our wonderful Terry a happy birthday every day throughout the month of August! I also have an unexplainably conflicting relationship with Terry which is why I also find pleasure in insulting him.'
+response_error = 'Sorry, there was an issue retrieving the insiprational quote.'
+session_error = 'Sorry, there is an issue with Inspirobot.'
+busy = 'Slow down, I\'m busy.'
 
 #gif urls
 gif_urls = [
