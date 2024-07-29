@@ -69,12 +69,13 @@ on_typing_replies = [
 on_voice_messages = [
   'look who it is',
   'oh no, not this guy',
-  'the birthday boy is back in town!!!',
+  'the curly haired boy is back in town!!!',
   'hey guys, terry just joined the call fyi',
   'it is terry my dudes'
 ]
 
 #on_voice_state_update audio paths
+on_voice_outro = './media/outro.mp3'
 on_voice_audio_paths = [
   './media/biden.wav',
   './media/lebron.wav',
@@ -87,6 +88,8 @@ on_voice_audio_paths = [
 #various single use messages
 self_hbd = 'Why are you wishing yourself a happy birthday lmao?'
 reply_prio = 'You don\'t know what prio is.'
+kick1 = 'Hey Terry\'s back! Let\'s all wish him farewell!'
+kick2 = 'Sorry Terry, you are no longer welcome in this call. Go back to the AFK channel.'
 
 #command messages
 cmd_info = 'I\'m HBDTerryBot, I have been programmed to wish our wonderful Terry a happy birthday every day throughout the month of August! I also have an unexplainably conflicting relationship with Terry which is why I also find pleasure in insulting him.'

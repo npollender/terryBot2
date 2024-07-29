@@ -21,6 +21,7 @@ bot = commands.Bot(command_prefix='>', intents=intents)
 cd_ontype_users = set()
 cd_onvoice_users = set()
 cd_reply_users = set()
+cd_d20_users = set()
 
 ################
 # --- INIT --- #
@@ -58,6 +59,7 @@ async def send_daily_hbd_message():
     if target_time.month == 8:
       await channel.send(random.choice(messages.hbd_messages))
       cd_reply_users.clear() #reply cd reset after daily hbd message is sent
+      cd_d20_users.clear()
     #when december - display xmas inspirobot quote
     elif target_time.month == 12:
       response = requests.get('https://inspirobot.me/api?generate=true&season=xmas')
@@ -129,9 +131,10 @@ async def on_typing(channel, user, when):
 #behavior for when someone joins a voice channel - 30min cd
 @bot.event
 async def on_voice_state_update(member, before, after, volume: float = 0.2):
+  now = datetime.now()
   if member.id == config.user_terry and before.channel is None and after.channel.id == config.voice_main and member.id not in cd_onvoice_users:
     cd_onvoice_users.add(member.id)
-    if random.random() < 0.2:
+    if random.random() < 0.2 and now.month == 8:
       await asyncio.sleep(5) #wait 5 seconds in case of initial connection delays
       await play_audio(after.channel, random.choice(messages.on_voice_audio_paths), volume)
     else:
@@ -139,6 +142,13 @@ async def on_voice_state_update(member, before, after, volume: float = 0.2):
       await text_channel.send(random.choice(messages.on_voice_messages))
     await asyncio.sleep(30 * 60)
     cd_onvoice_users.remove(member.id)
+  elif member.id == config.user_terry and before.channel is config.voice_afk and after.channel.id == config.voice_main:
+    if random.random() < 0.1:
+      text_channel = bot.get_channel(config.text_main)
+      await text_channel.send(messages.kick1)
+      await play_audio(after.channel, messages.on_voice_outro, volume)
+      await text_channel.send(messages.kick2)
+      await member.move_to(None)
 
 ####################
 # --- COMMANDS --- #
@@ -183,6 +193,23 @@ async def force_clear(ctx):
     cd_onvoice_users.clear()
     await ctx.send('Cooldown sets cleared.')
 
+@bot.command()
+async def d20(ctx):
+  cd_d20_users.add(ctx.author.id)
+  if ctx.author.id == config.user_terry and ctx.author.id not in cd_d20_users:
+    await ctx.send(f'🎲 You rolled a 1! Better luck next time.')
+  elif ctx.author.id not in cd_d20_users:
+    roll = random.randint(1, 20)
+    await ctx.send(f'🎲 You rolled a {roll}!')
+    member = ctx.guild.get_member(config.user_terry)
+    if roll == 20 and member.voice:
+      await ctx.send('Critical hit! You have successfully kicked Terry from the call.')
+      await member.move_to(None)
+    else:
+      await ctx.send('Critical hit! However, the special condition was not met...')
+  else:
+    await ctx.send('Sorry, you already rolled today.')
+    
 #####################
 # --- FUNCTIONS --- #
 #####################
