@@ -62,14 +62,14 @@ async def send_daily_hbd_message():
     elif target_time.month == 12:
       response = requests.get('https://inspirobot.me/api?generate=true&season=xmas')
       if response.status_code == 200:
-        await channel.send(response.content)
+        await channel.send(response.content.decode('utf-8'))
       else:
         print(f'Inspirobot error: status code = {response.status_code}')
     #when other months - display standard quote
     else:
       response = requests.get('https://inspirobot.me/api?generate=true')
       if response.status_code == 200:
-        await channel.send(response.content)
+        await channel.send(response.content.decode('utf-8'))
       else:
         print(f'Inspirobot error: status code = {response.status_code}')
 
@@ -107,7 +107,8 @@ async def on_message(message):
     elif message.author.id == config.user_terry and len(message.content) > 20:
       alt_chance = 1 / (len(messages.rude_replies) + 1)
       if random.random() < alt_chance:
-        await message.reply(f'{messages.alternate_case(message.content)}\n{messages.alternate_case_url}')
+        await message.reply(f'{messages.alternate_case(message.content)}')
+        await message.channel.send(f'{messages.alternate_case_url}')
       else:
         await message.reply(random.choice(messages.rude_replies))
     elif re.search(r'\b(?:prio|priority)\b', message.content, re.IGNORECASE):
@@ -130,10 +131,9 @@ async def on_typing(channel, user, when):
 async def on_voice_state_update(member, before, after, volume: float = 0.2):
   if member.id == config.user_terry and before.channel is None and after.channel.id == config.voice_main and member.id not in cd_onvoice_users:
     cd_onvoice_users.add(member.id)
-    if random.random() < 0.1:
-      await asyncio.sleep(10) #wait 10 seconds in case of initial connection delays
-      #TODO - find source for AI voices and add them to media folder
-      play_audio(after.channel, random.choice(messages.on_voice_audio_paths), volume)
+    if random.random() < 0.2:
+      await asyncio.sleep(5) #wait 5 seconds in case of initial connection delays
+      await play_audio(after.channel, random.choice(messages.on_voice_audio_paths), volume)
     else:
       text_channel = bot.get_channel(config.text_main)
       await text_channel.send(random.choice(messages.on_voice_messages))
@@ -154,12 +154,12 @@ async def info(ctx):
 async def inspireme(ctx, volume: float = 0.2):
   if not ctx.voice_client:
     session = requests.get('https://inspirobot.me/api?getSessionID=1')
-    if response.status_code == 200:
+    if session.status_code == 200:
       response = requests.get(f'https://inspirobot.me/api?generateFlow=1&sessionID={session.content}')
       if response.status_code == 200:
         data = response.json()
         media = data.get('mp3', None)
-        play_audio(ctx.author.voice.channel, media, volume)
+        await play_audio(ctx.author.voice.channel, media, volume)
       else:
         await ctx.send(messages.response_error)
     else:
@@ -173,7 +173,15 @@ async def quote(ctx):
   if ctx.author.id == config.user_nick:
     response = requests.get('https://inspirobot.me/api?generate=true')
     if response.status_code == 200:
-      await ctx.send(response.content)
+      await ctx.send(response.content.decode('utf-8'))
+
+@bot.command()
+async def force_clear(ctx):
+  if ctx.author.id == config.user_nick:
+    cd_reply_users.clear()
+    cd_ontype_users.clear()
+    cd_onvoice_users.clear()
+    await ctx.send('Cooldown sets cleared.')
 
 #####################
 # --- FUNCTIONS --- #
@@ -187,9 +195,12 @@ async def play_audio(channel, media, volume):
   audio_source = nextcord.FFmpegPCMAudio(media)
   audio_source = nextcord.PCMVolumeTransformer(audio_source, volume=volume)
 
-  def after_playing():
-    co_routine = voice_client.disconnect()
-    asyncio.run_coroutine_threadsafe(co_routine, bot.loop)
+  async def after_playing(error):
+    try:
+      co_ro = voice_client.disconnect()
+      asyncio.run_coroutine_threadsafe(co_ro, bot.loop)
+    except Exception as e:
+      print(f'Error disconnecting: {e}')
 
   if not voice_client.is_playing():
     voice_client.play(audio_source, after=after_playing)

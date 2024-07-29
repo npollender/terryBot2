@@ -76,7 +76,12 @@ on_voice_messages = [
 
 #on_voice_state_update audio paths
 on_voice_audio_paths = [
-
+  './media/biden.wav',
+  './media/lebron.wav',
+  './media/mickey.wav',
+  './media/moist.wav',
+  './media/reggie.wav',
+  './media/trump.wav'
 ]
 
 #various single use messages
