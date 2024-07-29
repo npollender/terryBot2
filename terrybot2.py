@@ -191,6 +191,7 @@ async def force_clear(ctx):
     cd_reply_users.clear()
     cd_ontype_users.clear()
     cd_onvoice_users.clear()
+    cd_d20_users.clear()
     await ctx.send('Cooldown sets cleared.')
 
 @bot.command()
