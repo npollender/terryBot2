@@ -196,7 +196,6 @@ async def force_clear(ctx):
 
 @bot.command()
 async def d20(ctx):
-  cd_d20_users.add(ctx.author.id)
   if ctx.author.id == config.user_terry and ctx.author.id not in cd_d20_users:
     await ctx.send(f'🎲 You rolled a 1! Better luck next time.')
   elif ctx.author.id not in cd_d20_users:
@@ -210,6 +209,7 @@ async def d20(ctx):
       await ctx.send('Critical hit! However, the special condition was not met...')
   else:
     await ctx.send('Sorry, you already rolled today.')
+  cd_d20_users.add(ctx.author.id)
     
 #####################
 # --- FUNCTIONS --- #
