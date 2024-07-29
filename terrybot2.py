@@ -14,6 +14,7 @@ import messages
 intents = nextcord.Intents.default()
 intents.message_content = True
 intents.typing = True
+intents.members = True
 
 bot = commands.Bot(command_prefix='>', intents=intents)
 
@@ -142,17 +143,26 @@ async def on_voice_state_update(member, before, after, volume: float = 0.2):
       await text_channel.send(random.choice(messages.on_voice_messages))
     await asyncio.sleep(30 * 60)
     cd_onvoice_users.remove(member.id)
-  elif member.id == config.user_terry and before.channel is config.voice_afk and after.channel.id == config.voice_main:
+  elif member.id == config.user_terry and before.channel is None:
+    print('Do nothing, just avoids error log.')
+  elif member.id == config.user_terry and before.channel.id == config.voice_afk and after.channel.id == config.voice_main:
+    print('here')
     if random.random() < 0.1:
       text_channel = bot.get_channel(config.text_main)
       await text_channel.send(messages.kick1)
       await play_audio(after.channel, messages.on_voice_outro, volume)
+      await asyncio.sleep(19)
       await text_channel.send(messages.kick2)
       await member.move_to(None)
 
 ####################
 # --- COMMANDS --- #
 ####################
+
+#command info
+@bot.command()
+async def cmd(ctx):
+  await ctx.send(messages.cmd_commands)
 
 #bot info
 @bot.command()
@@ -205,7 +215,7 @@ async def d20(ctx):
     if roll == 20 and member.voice:
       await ctx.send('Critical hit! You have successfully kicked Terry from the call.')
       await member.move_to(None)
-    else:
+    elif roll == 20:
       await ctx.send('Critical hit! However, the special condition was not met...')
   else:
     await ctx.send('Sorry, you already rolled today.')

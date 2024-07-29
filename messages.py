@@ -60,8 +60,8 @@ rude_replies = [
 
 #on_typing replies
 on_typing_replies = [
-  'shut up terry'
-  'stop typing terry'
+  'shut up terry',
+  'stop typing terry',
   'dont even think about sending that message terry, no one cares'
 ]
 
@@ -96,6 +96,7 @@ cmd_info = 'I\'m HBDTerryBot, I have been programmed to wish our wonderful Terry
 response_error = 'Sorry, there was an issue retrieving the insiprational quote.'
 session_error = 'Sorry, there is an issue with Inspirobot.'
 busy = 'Slow down, I\'m busy.'
+cmd_commands = 'List of commands:\ninfo\ninspireme\nd20'
 
 #gif urls
 gif_urls = [
