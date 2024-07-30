@@ -23,6 +23,7 @@ cd_ontype_users = set()
 cd_onvoice_users = set()
 cd_reply_users = set()
 cd_d20_users = set()
+cd_d20_crit = False
 
 ################
 # --- INIT --- #
@@ -149,11 +150,10 @@ async def on_voice_state_update(member, before, after, volume: float = 0.2):
     print('here')
     if random.random() < 0.1:
       text_channel = bot.get_channel(config.text_main)
-      await text_channel.send(messages.kick1)
+      await text_channel.send(messages.kick)
       await play_audio(after.channel, messages.on_voice_outro, volume)
       await asyncio.sleep(19)
-      await text_channel.send(messages.kick2)
-      await member.move_to(None)
+      await member.move_to(config.voice_afk)
 
 ####################
 # --- COMMANDS --- #
@@ -212,14 +212,24 @@ async def d20(ctx):
     roll = random.randint(1, 20)
     await ctx.send(f'🎲 You rolled a {roll}!')
     member = ctx.guild.get_member(config.user_terry)
-    if roll == 20 and member.voice:
+    if roll == 20 and member.voice and not cd_d20_crit:
       await ctx.send('Critical hit! You have successfully kicked Terry from the call.')
       await member.move_to(None)
-    elif roll == 20:
+      cd_d20_crit = True
+    elif roll == 20 and not member.voice:
       await ctx.send('Critical hit! However, the special condition was not met...')
+    elif roll == 20 and cd_d20_crit:
+      await ctx.send('Critical hit! But I don\'t feel like doing anything about it.')
+      if random.random() < 0.25:
+        cd_d20_crit = False
   else:
     await ctx.send('Sorry, you already rolled today.')
   cd_d20_users.add(ctx.author.id)
+
+@bot.command()
+async def force_d20_flag(ctx, flag: bool):
+  if ctx.author.id == config.user_nick:
+    cd_d20_crit = flag
     
 #####################
 # --- FUNCTIONS --- #

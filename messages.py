@@ -88,8 +88,7 @@ on_voice_audio_paths = [
 #various single use messages
 self_hbd = 'Why are you wishing yourself a happy birthday lmao?'
 reply_prio = 'You don\'t know what prio is.'
-kick1 = 'Hey Terry\'s back! Let\'s all wish him farewell!'
-kick2 = 'Sorry Terry, you are no longer welcome in this call. Go back to the AFK channel.'
+kick = 'No Terry, go back to the AFK channel. I\'ll play you out.'
 
 #command messages
 cmd_info = 'I\'m HBDTerryBot, I have been programmed to wish our wonderful Terry a happy birthday every day throughout the month of August! I also have an unexplainably conflicting relationship with Terry which is why I also find pleasure in insulting him.'
