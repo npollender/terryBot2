@@ -213,9 +213,20 @@ async def d20(ctx):
     await ctx.send(f'🎲 You rolled a {roll}!')
     member = ctx.guild.get_member(config.user_terry)
     if roll == 20 and member.voice and not cd_d20_crit:
-      await ctx.send('Critical hit! You have successfully kicked Terry from the call.')
-      await member.move_to(None)
-      cd_d20_crit = True
+      await ctx.send('Critical hit! Terry\'s fate has been sealed...')
+      rand = random.random()
+      await asyncio.sleep(15)
+      if rand < 0.1:
+        await member.move_to(None)
+      elif rand > 0.1 and rand < 0.35:
+        await member.edit(nick='Non-LethalNarwhal')
+      else:
+        role = ctx.guild.get_role(config.role_funny)
+        try:
+          await member.add_roles(role)
+        except Exception as e:
+          print(f'Error occured: {e}')
+      cd_d20_crit = True #kicking every time is a little mean so it will be less common
     elif roll == 20 and not member.voice:
       await ctx.send('Critical hit! However, the special condition was not met...')
     elif roll == 20 and cd_d20_crit:
