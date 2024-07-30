@@ -60,7 +60,6 @@ async def send_daily_hbd_message():
     if target_time.month == 8:
       await channel.send(random.choice(messages.hbd_messages))
       cd_reply_users.clear() #reply cd reset after daily hbd message is sent
-      cd_d20_users.clear()
     #when december - display xmas inspirobot quote
     elif target_time.month == 12:
       response = requests.get('https://inspirobot.me/api?generate=true&season=xmas')
@@ -75,6 +74,7 @@ async def send_daily_hbd_message():
         await channel.send(response.content.decode('utf-8'))
       else:
         print(f'Inspirobot error: status code = {response.status_code}')
+    cd_d20_users.clear() #reset d20 cd after daily msg
 
 #randomly change bot status every 15 minutes
 @tasks.loop(minutes=15)
