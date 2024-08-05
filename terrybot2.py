@@ -15,6 +15,7 @@ intents = nextcord.Intents.default()
 intents.message_content = True
 intents.typing = True
 intents.members = True
+intents.voice_states = True
 
 bot = commands.Bot(command_prefix='>', intents=intents)
 
@@ -202,8 +203,9 @@ async def force_clear(ctx):
     cd_ontype_users.clear()
     cd_onvoice_users.clear()
     cd_d20_users.clear()
-    await ctx.send('Cooldown sets cleared.')
+    await ctx.author.send('Cooldown sets cleared.')
 
+#roll a d20 - if you roll a 20 and terry is in the call, a funny punishment occurs
 @bot.command()
 async def d20(ctx):
   if ctx.author.id == config.user_terry and ctx.author.id not in cd_d20_users:
@@ -212,27 +214,36 @@ async def d20(ctx):
     roll = random.randint(1, 20)
     await ctx.send(f'🎲 You rolled a {roll}!')
     member = ctx.guild.get_member(config.user_terry)
-    if roll == 20 and member.voice and not cd_d20_crit:
-      await ctx.send('Critical hit! Terry\'s fate has been sealed...')
-      rand = random.random()
-      await asyncio.sleep(15)
-      if rand < 0.1:
-        await member.move_to(None)
-      elif rand > 0.1 and rand < 0.35:
-        await member.edit(nick='Non-LethalNarwhal')
+    if roll == 20:
+      if member.voice.channel.id == config.voice_main:
+        if not cd_d20_crit:
+          await ctx.send('Critical hit! Terry\'s fate has been sealed...')
+          rand = random.random()
+          await asyncio.sleep(15)
+          if rand < 0.05:
+            await member.move_to(None)
+          elif rand >= 0.05 and rand < 0.15:
+            try:
+              await member.edit(mute=True)
+              await asyncio.sleep(10)
+              await member.edit(mute=False)
+            except Exception as e:
+              print(f'Error occured: {e}')
+          elif rand >= 0.15 and rand < 0.4:
+            await member.edit(nick='Non-LethalNarwhal')
+          else:
+            role = ctx.guild.get_role(config.role_funny)
+            try:
+              await member.add_roles(role)
+            except Exception as e:
+              print(f'Error occured: {e}')
+          cd_d20_crit = True
+        else:
+          await ctx.send('Critical hit! But I don\'t feel like doing anything about it.')
+          if random.random() < 0.25:
+            cd_d20_crit = False
       else:
-        role = ctx.guild.get_role(config.role_funny)
-        try:
-          await member.add_roles(role)
-        except Exception as e:
-          print(f'Error occured: {e}')
-      cd_d20_crit = True #kicking every time is a little mean so it will be less common
-    elif roll == 20 and not member.voice:
-      await ctx.send('Critical hit! However, the special condition was not met...')
-    elif roll == 20 and cd_d20_crit:
-      await ctx.send('Critical hit! But I don\'t feel like doing anything about it.')
-      if random.random() < 0.25:
-        cd_d20_crit = False
+        await ctx.send('Critical hit! However, the special condition was not met...')
   else:
     await ctx.send('Sorry, you already rolled today.')
   cd_d20_users.add(ctx.author.id)
@@ -241,6 +252,7 @@ async def d20(ctx):
 async def force_d20_flag(ctx, flag: bool):
   if ctx.author.id == config.user_nick:
     cd_d20_crit = flag
+    ctx.author.send(f'D20 flag has been set to {flag}.')
     
 #####################
 # --- FUNCTIONS --- #
